@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/1/01.iml" filepath="$PROJECT_DIR$/1/01.iml" />
-      <module fileurl="file://$PROJECT_DIR$/2/2.iml" filepath="$PROJECT_DIR$/2/2.iml" />
-      <module fileurl="file://$PROJECT_DIR$/3/3.iml" filepath="$PROJECT_DIR$/3/3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/01/01.iml" filepath="$PROJECT_DIR$/01/01.iml" />
+      <module fileurl="file://$PROJECT_DIR$/02/02.iml" filepath="$PROJECT_DIR$/02/02.iml" />
+      <module fileurl="file://$PROJECT_DIR$/03/03.iml" filepath="$PROJECT_DIR$/03/03.iml" />
       <module fileurl="file://$PROJECT_DIR$/Advent2020.iml" filepath="$PROJECT_DIR$/Advent2020.iml" />
     </modules>
   </component>
