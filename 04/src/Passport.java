@@ -1,12 +1,13 @@
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Passport {
     private final Map<String, String> fields;
-    private static final String[] requiredFields = {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"};
-    private static final String[] eyeColors = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
+    private static final List<String> requiredFields = List.of("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid");
+    private static final List<String> eyeColors = List.of("amb", "blu", "brn", "gry", "grn", "hzl", "oth");
 
     public Passport(String fieldString) {
         fields = new HashMap<>(8);
@@ -22,12 +23,7 @@ public class Passport {
     }
 
     private boolean isValidNoRestrictions() {
-        for (String field : requiredFields) {
-            if (!fields.containsKey(field)) {
-                return false;
-            }
-        }
-        return true;
+        return fields.keySet().containsAll(requiredFields);
     }
 
     private boolean isValidRestrictions() {
@@ -88,13 +84,7 @@ public class Passport {
     }
 
     private boolean validecl() {
-        String ecl = fields.get("ecl");
-        for (String color : eyeColors) {
-            if (ecl.equals(color)) {
-                return true;
-            }
-        }
-        return false;
+        return eyeColors.contains(fields.get("ecl"));
     }
 
     private boolean validpid() {
