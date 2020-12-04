@@ -1,8 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Puzzle4 {
     public static void main(String[] args) throws FileNotFoundException {
@@ -16,39 +14,18 @@ public class Puzzle4 {
             passportStrings.add(input.next().replace('\n', ' '));
         }
 
+        List<Passport> passports = new ArrayList<>(300);
+        for (String passportString : passportStrings) {
+            passports.add(new Passport(passportString));
+        }
+
         System.out.println("===== Part 1 =====");
-        List<String> requiredFields = new ArrayList<>(7);
-        requiredFields.add("byr");
-        requiredFields.add("iyr");
-        requiredFields.add("eyr");
-        requiredFields.add("hgt");
-        requiredFields.add("hcl");
-        requiredFields.add("ecl");
-        requiredFields.add("pid");
 
-        List<Map<String, String>> passports = new ArrayList<>(300);
-        for (String passportS : passportStrings) {
-            Map<String, String> passport = new HashMap<>();
-            Pattern p = Pattern.compile("(\\w+):(\\S+)");
-            Matcher m = p.matcher(passportS);
-            while (m.find()) {
-                passport.put(m.group(1), m.group(2));
-            }
-            passports.add(passport);
-        }
+        int validCount1 = (int)passports.stream().filter(passport -> passport.isValid(false)).count();
 
-        int validCount = 0;
-        for (Map<String, String> passport : passports) {
-            boolean valid = true;
-            for (String field : requiredFields) {
-                if (!passport.containsKey(field)) {
-                    valid = false;
-                    break;
-                }
-            }
-            validCount += valid ? 1 : 0;
-        }
         System.out.println();
-        System.out.printf("Found %d valid passports%n", validCount);
+        System.out.printf("Found %d valid passports%n", validCount1);
+
+
     }
 }

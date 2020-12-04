@@ -25,4 +25,13 @@ public class CommonUtils {
         }
         return countCharInString(c.charAt(0), s);
     }
+
+    public static boolean tryParseInt(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
