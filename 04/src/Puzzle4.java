@@ -19,13 +19,15 @@ public class Puzzle4 {
             passports.add(new Passport(passportString));
         }
 
-        System.out.println("===== Part 1 =====");
+        System.out.println("===== Part 1 =====\n");
 
         int validCount1 = (int)passports.stream().filter(passport -> passport.isValid(false)).count();
 
-        System.out.println();
-        System.out.printf("Found %d valid passports%n", validCount1);
+        System.out.printf("Found %d valid passports%n%n", validCount1);
 
+        System.out.println("===== Part 2 =====\n");
 
+        int validCount2 = (int)passports.stream().filter(passport -> passport.isValid(true)).count();
+        System.out.printf("Found %d valid passports%n", validCount2);
     }
 }
