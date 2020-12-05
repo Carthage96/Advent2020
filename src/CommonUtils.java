@@ -26,6 +26,7 @@ public class CommonUtils {
         return countCharInString(c.charAt(0), s);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean tryParseInt(String s) {
         try {
             Integer.parseInt(s);
@@ -33,5 +34,10 @@ public class CommonUtils {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    // Prints header for part to console
+    public static void printPartHeader(int partNum) {
+        System.out.printf("===== Part %d =====%n%n", partNum);
     }
 }
