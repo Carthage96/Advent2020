@@ -22,7 +22,12 @@ public class Puzzle6 {
             }
             allGroups.add(group);
         }
-        int total = allGroups.stream().map(CustomsGroup::yesCount).reduce(0, Integer::sum);
-        System.out.printf("Total count: %d%n%n", total);
+        int totalAny = allGroups.stream().map(CustomsGroup::yesCountAny).reduce(0, Integer::sum);
+        System.out.printf("Total 'any' count: %d%n%n", totalAny);
+
+        CommonUtils.printPartHeader(2);
+
+        int totalEvery = allGroups.stream().map(CustomsGroup::yesCountEvery).reduce(0, Integer::sum);
+        System.out.printf("Total 'every' count: %d%n%n", totalEvery);
     }
 }
