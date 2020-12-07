@@ -1,11 +1,12 @@
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Bag {
     private String color;
-    private Map<String, Integer> contents;
+    private Map<Bag, Integer> contents;
 
-    public Bag(String color, Map<String, Integer> contents) {
+    public Bag(String color, Map<Bag, Integer> contents) {
         this.color = color;
         this.contents = new HashMap<>(contents);
     }
@@ -14,19 +15,19 @@ public class Bag {
         this(color, new HashMap<>());
     }
 
-    private int contains(String otherColor) {
-        return contents.getOrDefault(otherColor, 0);
-    }
-
     public int contains(Bag other) {
-        return contains(other.color);
+        return contents.getOrDefault(other, 0);
     }
 
-    public void addContents(String color, int count) {
-        contents.put(color, count);
+    public void addContents(Bag bag, int count) {
+        contents.put(bag, count);
     }
 
     public String getColor() {
         return color;
+    }
+
+    public Map<Bag, Integer> getContents() {
+        return Collections.unmodifiableMap(contents);
     }
 }
