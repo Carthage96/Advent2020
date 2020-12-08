@@ -16,31 +16,13 @@ public class Puzzle7 {
         CommonUtils.printPartHeader(1);
 
         Bag targetBag = allBags.get("shiny gold");
-        Set<Bag> allContainers = new HashSet<>();
-        Set<Bag> latestContainers = Set.of(targetBag);
-        do {
-            Set<Bag> newContainers = new HashSet<>();
-            for (Bag bag : allBags.values()) {
-                if (!allContainers.contains(bag)) {
-                    for (Bag container : latestContainers) {
-                        if (bag.contains(container) > 0) {
-                            newContainers.add(bag);
-                            break;
-                        }
-                    }
-                }
-            }
-            allContainers.addAll(newContainers);
-            latestContainers = newContainers;
-        } while (!latestContainers.isEmpty());
-
-        System.out.printf("%d possible exterior containers for a shiny gold bag%n%n", allContainers.size());
+        System.out.printf("%d possible exterior containers for a shiny gold bag%n%n", totalContainers(allBags, targetBag));
 
         CommonUtils.printPartHeader(2);
         System.out.printf("%d bags required inside a shiny gold bag%n", countTotalBags(allBags, targetBag) - 1);
     }
 
-    public static Map<String, Bag> createBagMap(File inputFile) throws FileNotFoundException {
+    private static Map<String, Bag> createBagMap(File inputFile) throws FileNotFoundException {
         Scanner input = new Scanner(inputFile);
         Map<String, Bag> allBags = new HashMap<>();
         Pattern bagColorRegex = Pattern.compile("(?:^| )(?<color>.+?) bag");
@@ -56,7 +38,7 @@ public class Puzzle7 {
         return allBags;
     }
 
-    public static void addBagContents(Map<String, Bag> allBags, File inputFile) throws FileNotFoundException {
+    private static void addBagContents(Map<String, Bag> allBags, File inputFile) throws FileNotFoundException {
         Scanner input = new Scanner(inputFile);
         Pattern exteriorBagRegex = Pattern.compile("^(?<color>.+?) bag");
         Pattern bagContentsRegex = Pattern.compile("(?<count>\\d+) (?<color>[\\w ]+) bag");
@@ -75,7 +57,22 @@ public class Puzzle7 {
         input.close();
     }
 
-    public static int countTotalBags(Map<String, Bag> allBags, Bag exteriorBag) {
+    private static int totalContainers(Map<String, Bag> allBags, Bag bag) {
+        return totalContainers(allBags, bag, new HashSet<>());
+    }
+
+    private static int totalContainers(Map<String, Bag> allBags, Bag containedBag, Set<Bag> containers) {
+        for (String color : allBags.keySet()) {
+            Bag bag = allBags.get(color);
+            if (!containers.contains(bag) && bag.contains(containedBag) > 0) {
+                containers.add(bag);
+                totalContainers(allBags, bag, containers);
+            }
+        }
+        return containers.size();
+    }
+
+    private static int countTotalBags(Map<String, Bag> allBags, Bag exteriorBag) {
         return 1 + exteriorBag.getContents().keySet().stream().mapToInt(bag ->
             exteriorBag.contains(bag) * countTotalBags(allBags, bag)
         ).sum();
