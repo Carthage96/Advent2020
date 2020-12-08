@@ -16,7 +16,20 @@ public class Puzzle8 {
         CommonUtils.printPartHeader(1);
 
         Simulator simulator = new Simulator(code);
-        int lastAccValue = simulator.runUntilDuplicate();
-        System.out.printf("acc value before repeated execution: %d%n", lastAccValue);
+        simulator.run();
+        System.out.printf("acc value before repeated execution: %d%n%n", simulator.getAcc());
+
+        CommonUtils.printPartHeader(2);
+        int[] candidates = simulator.corruptCandidates();
+        for (int i : candidates) {
+            simulator.reset();
+            simulator.swap(i);
+            if (simulator.run()) {
+                System.out.printf("Corrupted instruction: %d%n", i);
+                break;
+            }
+            simulator.swap(i);
+        }
+        System.out.printf("Final acc value: %d%n", simulator.getAcc());
     }
 }

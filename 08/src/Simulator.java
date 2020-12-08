@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class Simulator {
     private int acc;
@@ -20,11 +21,40 @@ public class Simulator {
         }
     }
 
-    public int runUntilDuplicate() {
-        while (!instructions.get(ptr).hasExecuted) {
+    // Returns true if the program finished successfully (ready to execute first non-existent instruction),
+    // false if it was about to enter an infinite loop
+    public boolean run() {
+        while (ptr < instructions.size() && !instructions.get(ptr).hasExecuted) {
             instructions.get(ptr).execute();
         }
+        return ptr >= instructions.size();
+    }
+
+    public int getAcc() {
         return acc;
+    }
+
+    public int[] corruptCandidates() {
+        return IntStream.range(0, instructions.size()).filter(x -> instructions.get(x).hasExecuted &&
+                !(instructions.get(x) instanceof ACC)).toArray();
+    }
+
+    public void reset() {
+        acc = 0;
+        ptr = 0;
+        for (Instruction instruction : instructions) {
+            instruction.hasExecuted = false;
+        }
+    }
+
+    public void swap(int index) {
+        Instruction instruction = instructions.get(index);
+        int value = instruction.value;
+        if (instruction instanceof NOP) {
+            instructions.set(index, new JMP(value));
+        } else if (instruction instanceof JMP) {
+            instructions.set(index, new NOP(value));
+        }
     }
 
     private static abstract class Instruction {
