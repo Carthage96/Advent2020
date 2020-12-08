@@ -19,7 +19,7 @@ public class Puzzle7 {
         System.out.printf("%d possible exterior containers for a shiny gold bag%n%n", totalContainers(allBags, targetBag));
 
         CommonUtils.printPartHeader(2);
-        System.out.printf("%d bags required inside a shiny gold bag%n", countTotalBags(allBags, targetBag) - 1);
+        System.out.printf("%d bags required inside a shiny gold bag%n", countTotalBags(targetBag) - 1);
     }
 
     private static Map<String, Bag> createBagMap(File inputFile) throws FileNotFoundException {
@@ -72,9 +72,9 @@ public class Puzzle7 {
         return containers.size();
     }
 
-    private static int countTotalBags(Map<String, Bag> allBags, Bag exteriorBag) {
+    private static int countTotalBags(Bag exteriorBag) {
         return 1 + exteriorBag.getContents().keySet().stream().mapToInt(bag ->
-            exteriorBag.contains(bag) * countTotalBags(allBags, bag)
+            exteriorBag.contains(bag) * countTotalBags(bag)
         ).sum();
     }
 }
