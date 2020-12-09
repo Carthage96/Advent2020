@@ -20,6 +20,12 @@ public class Puzzle9 {
 
         CommonUtils.printPartHeader(1);
 
-        System.out.printf("First invalid entry: %d%n", xmas.findFirstInvalid());
+        int invalid = xmas.findFirstInvalid();
+        System.out.printf("First invalid entry: %d%n%n", invalid);
+
+        CommonUtils.printPartHeader(2);
+
+        int weakness = xmas.findWeakness(invalid);
+        System.out.printf("Encryption Weakness: %d%n", weakness);
     }
 }

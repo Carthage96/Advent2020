@@ -1,3 +1,4 @@
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,5 +36,23 @@ public class XMASData {
             }
         }
         throw new IllegalStateException("Searched data, but didn't find invalid entry!");
+    }
+
+    public int findWeakness(int invalid) {
+        int start = 0;
+        int end = 0;
+        int sum = 0;
+        while (sum != invalid) {
+            if (sum < invalid) {
+                sum += data.get(end);
+                end++;
+            } else {
+                sum -= data.get(start);
+                start++;
+            }
+        }
+        int min = Collections.min(data.subList(start, end));
+        int max = Collections.max(data.subList(start, end));
+        return min + max;
     }
 }
