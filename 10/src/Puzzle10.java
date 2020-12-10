@@ -20,5 +20,8 @@ public class Puzzle10 {
 
         Map<Integer, Integer> differences = adapterChain.getDifferences();
         System.out.printf("Product of 1-jolt and 3-jolt differences = %d%n%n", differences.get(1) * differences.get(3));
+
+        CommonUtils.printPartHeader(2);
+        System.out.printf("Total number of valid chains: %d%n", adapterChain.countValidChains());
     }
 }
