@@ -1,3 +1,4 @@
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,21 +61,45 @@ public class SeatingArea {
 
     private void setAwareSeatsSimple(int row, int col) {
         Seat currentSeat = seatArray[row][col];
-        for (int direction = 0; direction <= 7; direction++) {
-            if (currentSeat.awareOf[direction] == null) {
-                int otherRow = row + directions[direction][0];
-                int otherCol = col + directions[direction][1];
-                if (isValidLocation(otherRow, otherCol)) {
-                    Seat otherSeat = seatArray[otherRow][otherCol];
-                    currentSeat.awareOf[direction] = otherSeat;
-                    otherSeat.awareOf[(direction + 4) % 8] = currentSeat;
+        if (currentSeat.currentState != SeatState.FLOOR) {
+            for (int direction = 0; direction <= 7; direction++) {
+                if (currentSeat.awareOf[direction] == null) {
+                    int otherRow = row + directions[direction][0];
+                    int otherCol = col + directions[direction][1];
+                    if (isValidLocation(otherRow, otherCol)) {
+                        Seat otherSeat = seatArray[otherRow][otherCol];
+                        currentSeat.awareOf[direction] = otherSeat;
+                        otherSeat.awareOf[(direction + 4) % 8] = currentSeat;
+                    }
                 }
             }
         }
     }
 
     private void setAwareSeatsComplex(int row, int col) {
+        Seat currentSeat = seatArray[row][col];
+        if (currentSeat.currentState != SeatState.FLOOR) {
+            for (int direction = 0; direction <= 7; direction++) {
+                if (currentSeat.awareOf[direction] == null) {
+                    Seat otherSeat = findSeatOnVector(row, col, directions[direction][0], directions[direction][1]);
+                    if (otherSeat != null) {
+                        currentSeat.awareOf[direction] = otherSeat;
+                        otherSeat.awareOf[(direction + 4) % 8] = currentSeat;
+                    }
+                }
+            }
+        }
+    }
 
+    private Seat findSeatOnVector(int startRow, int startCol, int deltaRow, int deltaCol) {
+        startRow += deltaRow;
+        startCol += deltaCol;
+        if (isValidLocation(startRow, startCol)) {
+            return seatArray[startRow][startCol].currentState == SeatState.FLOOR ?
+                    findSeatOnVector(startRow, startCol, deltaRow, deltaCol) : seatArray[startRow][startCol];
+        } else {
+            return null;
+        }
     }
 
     private boolean isValidLocation(int row, int col) {
@@ -107,7 +132,7 @@ public class SeatingArea {
         }
     }
 
-    private static class Seat {
+    private class Seat {
         private SeatState currentState;
         private SeatState nextState;
         private final Seat[] awareOf;
@@ -145,8 +170,22 @@ public class SeatingArea {
             switch (currentState) {
                 case FLOOR -> nextState = SeatState.FLOOR;
                 case EMPTY -> nextState = neighborsFull() == 0 ? SeatState.FULL : SeatState.EMPTY;
-                case FULL -> nextState = neighborsFull() >= 4 ? SeatState.EMPTY : SeatState.FULL;
+                case FULL -> nextState = neighborsFull() >= (isComplex ? 5 : 4) ? SeatState.EMPTY : SeatState.FULL;
             }
+        }
+    }
+
+    public void write(PrintStream output) {
+        for (int row = 0; row < nRows; row++) {
+            for (int col = 0; col < nCols; col++) {
+                char c = switch (seatArray[row][col].currentState) {
+                    case FLOOR -> '.';
+                    case FULL -> '#';
+                    default -> 'L';
+                };
+                output.print(c);
+            }
+            output.println();
         }
     }
 
