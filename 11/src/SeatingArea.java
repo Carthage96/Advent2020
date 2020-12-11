@@ -5,8 +5,27 @@ public class SeatingArea {
     private final Seat[][] seatArray;
     private final int nRows;
     private final int nCols;
+    private final boolean isComplex;
+    private static int[][] directions;
 
-    public SeatingArea(List<String> input) {
+    static {
+        staticInitializer();
+    }
+
+    private static void staticInitializer() {
+        directions = new int[8][2];
+        directions[0] = new int[]{-1, -1};
+        directions[1] = new int[]{-1, 0};
+        directions[2] = new int[]{-1, 1};
+        directions[3] = new int[]{0, 1};
+        directions[4] = new int[]{1, 1};
+        directions[5] = new int[]{1, 0};
+        directions[6] = new int[]{1, -1};
+        directions[7] = new int[]{0, -1};
+    }
+
+    public SeatingArea(List<String> input, boolean isComplex) {
+        this.isComplex = isComplex;
         nRows = input.size();
         nCols = input.get(0).length();
         seatArray = new Seat[nRows][nCols];
@@ -20,6 +39,46 @@ public class SeatingArea {
                 }
             }
         }
+
+        for (int row = 0; row < nRows; row++) {
+            for (int col = 0; col < nCols; col++) {
+                setAwareSeats(row, col);
+            }
+        }
+    }
+
+    private void setAwareSeats(int row, int col) {
+        // [0] [1] [2]
+        // [7] [X] [3]
+        // [6] [5] [4]
+        if (isComplex) {
+            setAwareSeatsComplex(row, col);
+        } else {
+            setAwareSeatsSimple(row, col);
+        }
+    }
+
+    private void setAwareSeatsSimple(int row, int col) {
+        Seat currentSeat = seatArray[row][col];
+        for (int direction = 0; direction <= 7; direction++) {
+            if (currentSeat.awareOf[direction] == null) {
+                int otherRow = row + directions[direction][0];
+                int otherCol = col + directions[direction][1];
+                if (isValidLocation(otherRow, otherCol)) {
+                    Seat otherSeat = seatArray[otherRow][otherCol];
+                    currentSeat.awareOf[direction] = otherSeat;
+                    otherSeat.awareOf[(direction + 4) % 8] = currentSeat;
+                }
+            }
+        }
+    }
+
+    private void setAwareSeatsComplex(int row, int col) {
+
+    }
+
+    private boolean isValidLocation(int row, int col) {
+        return row >= 0 && row < nRows && col >= 0 && col < nCols;
     }
 
     public int totalFull() {
@@ -29,7 +88,7 @@ public class SeatingArea {
     public boolean run1Step() {
         for (int row = 0; row < nRows; row++) {
             for (int col = 0; col < nCols; col++) {
-                seatArray[row][col].computeNext(buildNeighborInfo(row, col));
+                seatArray[row][col].computeNext();
             }
         }
         boolean different = false;
@@ -51,10 +110,12 @@ public class SeatingArea {
     private static class Seat {
         private SeatState currentState;
         private SeatState nextState;
+        private final Seat[] awareOf;
 
         public Seat(SeatState state) {
             currentState = state;
             nextState = state;
+            awareOf = new Seat[8];
         }
 
         public SeatState getCurrentState() {
@@ -68,61 +129,29 @@ public class SeatingArea {
             return different;
         }
 
-        public void computeNext(NeighborInfo neighbors) {
+        private int neighborCount(SeatState state) {
+            return (int)Arrays.stream(awareOf).filter(x -> x != null && x.currentState == state).count();
+        }
+
+        private int neighborsEmpty() {
+            return neighborCount(SeatState.EMPTY);
+        }
+
+        private int neighborsFull() {
+            return neighborCount(SeatState.FULL);
+        }
+
+        public void computeNext() {
             switch (currentState) {
                 case FLOOR -> nextState = SeatState.FLOOR;
-                case EMPTY -> nextState = neighbors.countFull() == 0 ? SeatState.FULL : SeatState.EMPTY;
-                case FULL -> nextState = neighbors.countFull() >= 4 ? SeatState.EMPTY : SeatState.FULL;
+                case EMPTY -> nextState = neighborsFull() == 0 ? SeatState.FULL : SeatState.EMPTY;
+                case FULL -> nextState = neighborsFull() >= 4 ? SeatState.EMPTY : SeatState.FULL;
             }
         }
-    }
-
-    private NeighborInfo buildNeighborInfo(int centerRow, int centerCol) {
-        SeatState[] states = new SeatState[8];
-        for (int rowMod = -1; rowMod <= 1; rowMod++) {
-            for (int colMod = -1; colMod <= 1; colMod++) {
-                if (rowMod == 0 && colMod == 0) {
-                    continue;
-                }
-                int row = centerRow + rowMod;
-                int col = centerCol + colMod;
-                boolean isValid = row >= 0 && row < seatArray.length && col >= 0 && col < seatArray[0].length;
-                int index = (rowMod + 1) * 3 + (colMod + 1);
-                // adjust to remove center element of grid
-                index -= index > 4 ? 1 : 0;
-                states[index] =
-                        isValid ? seatArray[row][col].getCurrentState() : SeatState.UNKNOWN;
-            }
-        }
-        return new NeighborInfo(states);
-    }
-
-    private static class NeighborInfo {
-        // [0] [1] [2]
-        // [3] [X] [4]
-        // [5] [6] [7]
-        private final SeatState[] neighbors;
-
-        public NeighborInfo(SeatState[] neighbors) {
-            this.neighbors = neighbors;
-        }
-
-        private int count(SeatState state) {
-            return (int)Arrays.stream(neighbors).filter(x -> x == state).count();
-        }
-
-        public int countEmpty() {
-            return count(SeatState.EMPTY);
-        }
-
-        public int countFull() {
-            return count(SeatState.FULL);
-        }
-
     }
 
     enum SeatState {
-        FLOOR, EMPTY, FULL, UNKNOWN
+        FLOOR, EMPTY, FULL
     }
 }
 

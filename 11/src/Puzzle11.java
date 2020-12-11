@@ -9,7 +9,7 @@ public class Puzzle11 {
         Scanner console = new Scanner(System.in);
         List<String> input = Files.readAllLines(new File(CommonUtils.prompt(console, "input file: ")).toPath());
 
-        SeatingArea seatingArea = new SeatingArea(input);
+        SeatingArea seatingArea = new SeatingArea(input, false);
 
         CommonUtils.printPartHeader(1);
 
