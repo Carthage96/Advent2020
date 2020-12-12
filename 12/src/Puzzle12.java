@@ -14,7 +14,15 @@ public class Puzzle12 {
 
         Ship ship = new Ship();
         for (String command : input) {
-            ship.execute(command);
+            ship.execute(command, true);
+        }
+        System.out.printf("Manhattan Distance: %d%n%n", ship.manhattanDistance());
+
+        CommonUtils.printPartHeader(2);
+
+        ship = new Ship();
+        for (String command : input) {
+            ship.execute(command, false);
         }
         System.out.printf("Manhattan Distance: %d%n%n", ship.manhattanDistance());
     }
