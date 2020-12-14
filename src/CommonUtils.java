@@ -1,9 +1,18 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Scanner;
 
 public class CommonUtils {
     public static String prompt(Scanner console, String prompt) {
         System.out.print(prompt);
         return console.nextLine();
+    }
+
+    public static List<String> readInputToList() throws IOException {
+        Scanner console = new Scanner(System.in);
+        return Files.readAllLines(new File(CommonUtils.prompt(console, "input file: ")).toPath());
     }
 
     // Returns the number of occurrences of a character c in a String s
