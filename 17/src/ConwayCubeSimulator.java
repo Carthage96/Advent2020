@@ -5,11 +5,11 @@ public class ConwayCubeSimulator {
     private final Map<Coordinate, Cube> newCubes;
     private int step;
 
-    public ConwayCubeSimulator(List<List<Boolean>> initialState) {
+    public ConwayCubeSimulator(List<List<Boolean>> initialState, boolean is4D) {
         space = new HashMap<>();
         for (int x = 0; x < initialState.size(); x++) {
             for (int y = 0; y < initialState.get(x).size(); y++) {
-                Coordinate c = new Coordinate3D(x, y, 0);
+                Coordinate c = is4D ? new Coordinate4D(x, y, 0, 0) : new Coordinate3D(x, y, 0);
                 space.put(c, new Cube(c, initialState.get(x).get(y)));
                 space.get(c).initialize();
             }

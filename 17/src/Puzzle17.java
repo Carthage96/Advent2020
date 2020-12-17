@@ -12,7 +12,13 @@ public class Puzzle17 {
 
         CommonUtils.printPartHeader(1);
 
-        ConwayCubeSimulator simulator = new ConwayCubeSimulator(input);
+        ConwayCubeSimulator simulator = new ConwayCubeSimulator(input, false);
+        simulator.advanceTo(6);
+        System.out.printf("Total active: %d%n%n", simulator.countActive());
+
+        CommonUtils.printPartHeader(2);
+
+        simulator = new ConwayCubeSimulator(input, true);
         simulator.advanceTo(6);
         System.out.printf("Total active: %d%n%n", simulator.countActive());
     }
