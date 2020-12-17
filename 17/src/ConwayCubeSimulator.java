@@ -9,7 +9,7 @@ public class ConwayCubeSimulator {
         space = new HashMap<>();
         for (int x = 0; x < initialState.size(); x++) {
             for (int y = 0; y < initialState.get(x).size(); y++) {
-                Coordinate c = new Coordinate(x, y, 0);
+                Coordinate c = new Coordinate3D(x, y, 0);
                 space.put(c, new Cube(c, initialState.get(x).get(y)));
                 space.get(c).initialize();
             }
@@ -53,32 +53,6 @@ public class ConwayCubeSimulator {
         return space.values().stream().filter(Cube::isActive).count();
     }
 
-    @Override
-    public String toString() {
-        int minX = space.keySet().stream().mapToInt(c -> c.x).min().orElse(0);
-        int maxX = space.keySet().stream().mapToInt(c -> c.x).max().orElse(0);
-        int minY = space.keySet().stream().mapToInt(c -> c.y).min().orElse(0);
-        int maxY = space.keySet().stream().mapToInt(c -> c.y).max().orElse(0);
-        int minZ = space.keySet().stream().mapToInt(c -> c.z).min().orElse(0);
-        int maxZ = space.keySet().stream().mapToInt(c -> c.z).max().orElse(0);
-        StringBuilder builder = new StringBuilder();
-        for (int z = minZ; z <= maxZ; z++) {
-            builder.append("z=");
-            builder.append(z);
-            builder.append('\n');
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    Coordinate c = new Coordinate(x, y, z);
-                    builder.append((space.containsKey(c) && space.get(c).isActive()) ? '#' : '.');
-                }
-                builder.append('\n');
-            }
-            builder.append('\n');
-        }
-        builder.append('\n');
-        return builder.toString();
-    }
-
     private class Cube {
         private final Coordinate coordinate;
         private boolean active;
@@ -102,19 +76,11 @@ public class ConwayCubeSimulator {
 
         public void computeNext() {
             int activeNeighbors = 0;
-            for (int x = coordinate.x - 1; x <= coordinate.x + 1; x++) {
-                for (int y = coordinate.y - 1; y <= coordinate.y + 1; y++) {
-                    for (int z = coordinate.z - 1; z <= coordinate.z + 1; z++) {
-                        Coordinate c = new Coordinate(x, y ,z);
-                        if (c.equals(coordinate)) {
-                            continue;
-                        }
-                        if (!space.containsKey(c) && !newCubes.containsKey(c) && initialized) {
-                            newCubes.put(c, new Cube(c, false));
-                        }
-                        activeNeighbors += space.containsKey(c) && space.get(c).isActive() ? 1 : 0;
-                    }
+            for (Coordinate c : coordinate.neighbors()) {
+                if (!space.containsKey(c) && !newCubes.containsKey(c) && initialized) {
+                    newCubes.put(c, new Cube(c, false));
                 }
+                activeNeighbors += space.containsKey(c) && space.get(c).isActive() ? 1 : 0;
             }
             if (active) {
                 next = activeNeighbors == 2 || activeNeighbors == 3;
@@ -140,22 +106,124 @@ public class ConwayCubeSimulator {
         }
     }
 
-    private static class Coordinate {
+    private interface Coordinate {
+        Iterable<Coordinate> neighbors();
+    }
+
+    private static class Coordinate4D implements Coordinate {
         public final int x;
         public final int y;
         public final int z;
+        public final int w;
+        private final Neighbors n;
 
-        public Coordinate(int x, int y, int z) {
+        public Coordinate4D(int x, int y, int z, int w) {
             this.x = x;
             this.y = y;
             this.z = z;
+            this.w = w;
+            n = new Neighbors();
+        }
+
+        public Iterable<Coordinate> neighbors() {
+            return n;
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Coordinate that = (Coordinate) o;
+            Coordinate4D that = (Coordinate4D) o;
+            return x == that.x &&
+                    y == that.y &&
+                    z == that.z &&
+                    w == that.w;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y, z, w);
+        }
+
+        @Override
+        public String toString() {
+            return "{" + x + "," + y + "," + z + "," + w + "}";
+        }
+
+        private class Neighbors implements Iterable<Coordinate> {
+            @Override
+            public Iterator<Coordinate> iterator() {
+                return new NeighborIterator();
+            }
+
+            private class NeighborIterator implements Iterator<Coordinate> {
+                private int xMod;
+                private int yMod;
+                private int zMod;
+                private int wMod;
+
+                public NeighborIterator() {
+                    xMod = -1;
+                    yMod = -1;
+                    zMod = -1;
+                    wMod = -1;
+                }
+
+                @Override
+                public boolean hasNext() {
+                    return xMod <= 1;
+                }
+
+                @Override
+                public Coordinate next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
+                    Coordinate result = new Coordinate4D(x + xMod, y + yMod, z + zMod, w + wMod);
+                    if (wMod < 1) {
+                        wMod++;
+                    } else {
+                        wMod = -1;
+                        if (zMod < 1) {
+                            zMod++;
+                        } else {
+                            zMod = -1;
+                            if (yMod < 1) {
+                                yMod++;
+                            } else {
+                                yMod = -1;
+                                xMod++;
+                            }
+                        }
+                    }
+                    return result.equals(Coordinate4D.this) ? next() : result;
+                }
+            }
+        }
+    }
+
+    private static class Coordinate3D implements Coordinate {
+        public final int x;
+        public final int y;
+        public final int z;
+        private final Neighbors n;
+
+        public Coordinate3D(int x, int y, int z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            n = new Neighbors();
+        }
+
+        public Iterable<Coordinate> neighbors() {
+            return n;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Coordinate3D that = (Coordinate3D) o;
             return x == that.x &&
                     y == that.y &&
                     z == that.z;
@@ -169,6 +237,50 @@ public class ConwayCubeSimulator {
         @Override
         public String toString() {
             return "{" + x + "," + y + "," + z + "}";
+        }
+
+        private class Neighbors implements Iterable<Coordinate> {
+            @Override
+            public Iterator<Coordinate> iterator() {
+                return new NeighborIterator();
+            }
+
+            private class NeighborIterator implements Iterator<Coordinate> {
+                private int xMod;
+                private int yMod;
+                private int zMod;
+
+                public NeighborIterator() {
+                    xMod = -1;
+                    yMod = -1;
+                    zMod = -1;
+                }
+
+                @Override
+                public boolean hasNext() {
+                    return xMod <= 1;
+                }
+
+                @Override
+                public Coordinate next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
+                    Coordinate result = new Coordinate3D(x + xMod, y + yMod, z + zMod);
+                    if (zMod < 1) {
+                        zMod++;
+                    } else {
+                        zMod = -1;
+                        if (yMod < 1) {
+                            yMod++;
+                        } else {
+                            yMod = -1;
+                            xMod++;
+                        }
+                    }
+                    return result.equals(Coordinate3D.this) ? next() : result;
+                }
+            }
         }
     }
 }
