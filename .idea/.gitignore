@@ -2,3 +2,6 @@
 /shelf/
 /workspace.xml
 codeStyles/
+
+#IDE files
+uiDesigner.xml
