@@ -26,7 +26,7 @@ public class CommonUtils {
         return count;
     }
 
-    // Returns the number of currences of a single character in a String s
+    // Returns the number of occurrences of a single character in a String s
     // Pre: c must be a String of length 1
     public static int countCharInString(String c, String s) {
         if (c.length() > 1) {
