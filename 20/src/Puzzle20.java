@@ -27,8 +27,15 @@ public class Puzzle20 {
             }
         }
 
+        CommonUtils.printPartHeader(1);
+
         ImageReconstructor reconstructor = new ImageReconstructor(tileInput);
         reconstructor.resolveImage();
         System.out.printf("Corner product = %d%n%n", reconstructor.cornerProduct());
+
+        CommonUtils.printPartHeader(2);
+        Image restoredImage = reconstructor.toImage();
+        int roughness = restoredImage.seaMonsterSearch();
+        System.out.printf("Water roughness = %d%n", roughness);
     }
 }

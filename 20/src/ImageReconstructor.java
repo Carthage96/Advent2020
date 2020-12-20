@@ -140,6 +140,24 @@ public class ImageReconstructor {
                 placedTiles[size - 1][size - 1].id;
     }
 
+    public Image toImage() {
+        if (unplacedTiles.size() > 0) {
+            throw new IllegalStateException("Image has not been resolved yet!");
+        }
+        int tileSize = placedTiles[0][0].getNoBorderSize();
+        int fullSize = size * tileSize;
+        char[][] fullArray = new char[fullSize][fullSize];
+        for (int tileRow = 0; tileRow < size; tileRow++) {
+            for (int tileCol = 0; tileCol < size; tileCol++) {
+                char[][] tileArray = placedTiles[tileRow][tileCol].noBorders();
+                for (int row = 0; row < tileArray.length; row++) {
+                    System.arraycopy(tileArray[row], 0, fullArray[tileRow * tileSize + row], tileCol * tileSize, tileSize);
+                }
+            }
+        }
+        return new Image(fullArray);
+    }
+
     private static class Tile {
         private final int id;
         private char[][] image;
@@ -198,6 +216,10 @@ public class ImageReconstructor {
             return result;
         }
 
+        public int getNoBorderSize() {
+            return image.length - 2;
+        }
+
         public void print() {
             for (char[] row : image) {
                 for (char c : row) {
@@ -206,6 +228,15 @@ public class ImageReconstructor {
                 System.out.println();
             }
             System.out.println();
+        }
+
+        public char[][] noBorders() {
+            char[][] result = new char[image.length - 2][image[image.length - 1].length - 2];
+            for (int row = 1; row < image.length - 1; row++) {
+                if (image[image.length - 1].length - 2 >= 0)
+                    System.arraycopy(image[row], 1, result[row - 1], 0, image[row].length - 2);
+            }
+            return result;
         }
     }
 
