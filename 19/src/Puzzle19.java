@@ -4,7 +4,7 @@ import java.util.List;
 public class Puzzle19 {
     public static void main(String[] args) throws IOException {
         for (int i = 1; i <= 2; i++) {
-            CommonUtils.printPartHeader(1);
+            CommonUtils.printPartHeader(i);
             List<String> input = CommonUtils.readInputToList();
             int split = input.indexOf("");
             MonsterMessageMatcher matcher = new MonsterMessageMatcher(input.subList(0, split));
