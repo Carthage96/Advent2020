@@ -8,7 +8,13 @@ public class Puzzle21 {
 
         CommonUtils.printPartHeader(1);
 
+        allergenManager.findAllergenFreeIngredients();
         System.out.printf("Allergen free ingredients appearances: %d%n%n",
                 allergenManager.countAllergenFreeIngredientOccurrences());
+
+        CommonUtils.printPartHeader(2);
+        allergenManager.assignAllergens();
+        System.out.println("Canonical Dangerous Ingredients List:");
+        System.out.println(allergenManager.canonicalDangerousIngredientsList());
     }
 }
