@@ -57,6 +57,12 @@ public class CupCircle {
         return sb.toString();
     }
 
+    // Returns the product of the indices of the two cups following cup 1 in the current state of the circle
+    // (This is the answer for part 2 of the puzzle)
+    public long getCupProduct() {
+        return (long)(Cup.getInstance(1).next.label) * (long)(Cup.getInstance(1).next.next.label);
+    }
+
     private static class Cup {
         public final int label;
         public Cup next;
