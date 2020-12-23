@@ -1,17 +1,18 @@
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CupCircle {
     private Cup currentCup;
 
-    public CupCircle(int[] initialOrder) {
-        if (initialOrder.length < 4) {
+    public CupCircle(List<Integer> initialOrder) {
+        if (initialOrder.size() < 4) {
             throw new IllegalArgumentException("Cup circle must contain at least 4 cups");
         }
-        currentCup = Cup.getInstance(initialOrder[0]);
+        currentCup = Cup.getInstance(initialOrder.get(0));
         Cup prev = currentCup;
-        for (int i = 1; i < initialOrder.length; i++) {
-            Cup current = Cup.getInstance(initialOrder[i]);
+        for (int i = 1; i < initialOrder.size(); i++) {
+            Cup current = Cup.getInstance(initialOrder.get(i));
             prev.next = current;
             prev = current;
         }
