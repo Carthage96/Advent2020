@@ -12,5 +12,10 @@ public class Puzzle24 {
             lobbyFloor.flipTile(line);
         }
         System.out.printf("Number of black tiles: %d%n%n", lobbyFloor.countBlackTiles());
+
+        CommonUtils.printPartHeader(2);
+
+        lobbyFloor.advanceDays(100);
+        System.out.printf("Number of black tiles: %d%n", lobbyFloor.countBlackTiles());
     }
 }
