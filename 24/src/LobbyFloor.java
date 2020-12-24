@@ -3,11 +3,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public class LobbyFloor {
-    private final Map<Point, Boolean> allTiles;
+    private final Map<Point, Tile> allTiles;
 
     public LobbyFloor() {
         allTiles = new HashMap<>();
-        allTiles.put(new Point(0,0), false);
+        allTiles.put(new Point(0,0), new Tile());
     }
 
     public void flipTile(String path) {
@@ -16,8 +16,7 @@ public class LobbyFloor {
 
     private void flipTileInternal(String path, int index, int x, int y) {
         if (index == path.length()) {
-            Point p = new Point(x, y);
-            allTiles.put(p, !allTiles.getOrDefault(p, false));
+            getTile(new Point(x, y)).flip();
         } else {
             switch (path.charAt(index)) {
                 case 'e' -> flipTileInternal(path, index + 1, x + 1, y);
@@ -39,7 +38,30 @@ public class LobbyFloor {
     }
 
     public long countBlackTiles() {
-        return allTiles.values().stream().filter(x -> x).count();
+        return allTiles.values().stream().filter(x -> x.isBlack).count();
+    }
+
+    private Tile getTile(Point p) {
+        if (!allTiles.containsKey(p)) {
+            allTiles.put(p, new Tile());
+        }
+        return allTiles.get(p);
+    }
+
+    private static class Tile {
+        public boolean isBlack;
+
+        public Tile() {
+            this(false);
+        }
+
+        public Tile(boolean isBlack) {
+            this.isBlack = isBlack;
+        }
+
+        public void flip() {
+            isBlack = !isBlack;
+        }
     }
 
     private static class Point {
